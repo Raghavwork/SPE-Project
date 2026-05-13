@@ -1,0 +1,70 @@
+# Infrastructure Services
+apiVersion: v1
+kind: Service
+metadata:
+  name: elasticsearch
+  namespace: medical-chatbot
+spec:
+  selector:
+    app: elasticsearch
+  ports:
+  - port: 9200
+    targetPort: 9200
+    name: http
+  - port: 9300
+    targetPort: 9300
+    name: transport
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: logstash
+  namespace: medical-chatbot
+spec:
+  selector:
+    app: logstash
+  ports:
+  - port: 5044
+    targetPort: 5044
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kibana
+  namespace: medical-chatbot
+spec:
+  selector:
+    app: kibana
+  ports:
+  - port: 5601
+    targetPort: 5601
+  type: ClusterIP  # Changed for easier access in Minikube
+---
+# Application Services
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: medical-chatbot
+spec:
+  selector:
+    app: backend
+  ports:
+  - port: 8000
+    targetPort: 8000
+  type: ClusterIP  # Changed for easier access in Minikube
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  namespace: medical-chatbot
+spec:
+  selector:
+    app: frontend
+  ports:
+  - port: 80
+    targetPort: 80
+  type: ClusterIP  # Changed for easier access in Minikube

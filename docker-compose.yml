@@ -1,0 +1,73 @@
+version: '3.9'
+
+services:
+  backend:
+    container_name: backend
+    build:
+      context: ./backend
+    image: manasmann/medical-chatbot-backend:latest
+    ports:
+      - "${BACKEND_PORT}:8000"
+    volumes:
+      - ${LOGS_DIR}:/app/logs
+    environment:
+      VAULT_URL: ${VAULT_URL}
+      VAULT_TOKEN: ${VAULT_TOKEN_Docker}
+      MONGODB_URL: ${MONGODB_URL}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  frontend:
+    container_name: frontend
+    build:
+      context: ./frontend
+    image: manasmann/medical-chatbot-frontend:latest
+    ports:
+      - "${FRONTEND_PORT}:80"
+    depends_on:
+      - backend
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_VERSION}
+    container_name: elasticsearch
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: "false"
+    ports:
+      - "${ELASTICSEARCH_PORT}:9200"
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:${ELASTIC_VERSION}
+    container_name: logstash
+    depends_on:
+      - elasticsearch
+    ports:
+      - "${LOGSTASH_PORT}:5044"
+    volumes:
+      - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:${ELASTIC_VERSION}
+    container_name: kibana
+    depends_on:
+      - elasticsearch
+    ports:
+      - "${KIBANA_PORT}:5601"
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:${ELASTIC_VERSION}
+    container_name: filebeat
+    depends_on:
+      - logstash
+    volumes:
+      - ./filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - ${LOGS_DIR}:/logs:ro
+    user: root
+    command: ["--strict.perms=false"]
+
+volumes:
+  esdata:

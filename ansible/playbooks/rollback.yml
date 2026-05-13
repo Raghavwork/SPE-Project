@@ -1,0 +1,56 @@
+- name: Rollback Medical Chatbot Application
+  hosts: minikube
+  gather_facts: no
+  vars:
+    kubeconfig: "{{ kubeconfig_path | default('~/.kube/config') }}"
+    
+  tasks:
+    - name: Display rollback start message
+      debug:
+        msg: "Starting rollback of {{ app_name }} in namespace {{ namespace }}"
+        
+    - name: Scale down all deployments
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kubeconfig }}"
+        state: present
+        definition:
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: "{{ item }}"
+            namespace: "{{ namespace }}"
+          spec:
+            replicas: 0
+      loop:
+        - backend
+        - frontend
+        - elasticsearch
+        - logstash
+        - kibana
+      ignore_errors: yes
+      
+    - name: Wait for pods to terminate
+      pause:
+        seconds: 30
+        
+    - name: Delete all resources
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kubeconfig }}"
+        state: absent
+        api_version: v1
+        kind: "{{ item.kind }}"
+        name: "{{ item.name }}"
+        namespace: "{{ namespace }}"
+      loop:
+        - { kind: "Deployment", name: "backend" }
+        - { kind: "Deployment", name: "frontend" }
+        - { kind: "Deployment", name: "elasticsearch" }
+        - { kind: "Deployment", name: "logstash" }
+        - { kind: "Deployment", name: "kibana" }
+        - { kind: "HorizontalPodAutoscaler", name: "backend-hpa" }
+        - { kind: "HorizontalPodAutoscaler", name: "frontend-hpa" }
+      ignore_errors: yes
+      
+    - name: Display rollback completion message
+      debug:
+        msg: "🔄 Rollback completed. All deployments have been scaled down and removed."
