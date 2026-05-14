@@ -132,7 +132,7 @@ sudo apt install -y mongodb
 
 ### **1. Clone Repository**
 ```bash
-git clone https://github.com/manas-manna/medical-chatbot.git
+git clone https://github.com/Raghavwork/medical-chatbot.git
 cd medical-chatbot
 ```
 
@@ -167,7 +167,7 @@ kubectl cluster-info
 
 #### **Option A: Jenkins Pipeline (Recommended)**
 1. Create new Pipeline job in Jenkins
-2. Configure SCM: `https://github.com/manas-manna/medical-chatbot.git`
+2. Configure SCM: `https://github.com/Raghavwork/medical-chatbot.git`
 3. Run pipeline: **Build Now**
 
 #### **Option B: Manual Deployment**
@@ -426,21 +426,16 @@ docker-compose logs -f
 - **Ansible Docs**: https://docs.ansible.com/
 
 ### **Issue Reporting**
-- **GitHub Issues**: https://github.com/manas-manna/medical-chatbot/issues
+- **GitHub Issues**: https://github.com/Raghavwork/medical-chatbot/issues
 - **Bug Reports**: Include logs and environment details
 - **Feature Requests**: Describe use case and expected behavior
 
 ### **Maintainer**
-- **Name**: Manas Ranjan Manna
-- **GitHub**: [@manas-manna](https://github.com/manas-manna)
+- **Name**: Raghav Goyal
+- **GitHub**: [@Raghavwork](https://github.com/Raghavwork)
 - **Project**: Medical Chatbot DevOps Implementation
 
 ---
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
 ## 🙏 Acknowledgments
 
 - **FastAPI** team for excellent framework
